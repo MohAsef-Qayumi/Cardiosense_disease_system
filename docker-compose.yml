@@ -1,0 +1,35 @@
+services:
+  api:
+    build:
+      context: ./ml
+      dockerfile: Dockerfile
+    image: cardiosense-ml-api:latest
+    ports:
+      - "8000:8000"
+    environment:
+      CARDIOSENSE_DB_BACKEND: mongodb
+      CARDIOSENSE_MONGODB_URI: mongodb://mongo:27017
+      CARDIOSENSE_MONGODB_DATABASE: cardiosense
+      CARDIOSENSE_MONGODB_PASSWORD: ""
+      CARDIOSENSE_HASH_SALT: cardiosense-local-docker-salt
+      CARDIOSENSE_CORS_ALLOW_ORIGINS: http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000
+      CARDIOSENSE_BOOTSTRAP_LOCAL_MODEL: "true"
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - cardiosense-mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  cardiosense-mongo-data:

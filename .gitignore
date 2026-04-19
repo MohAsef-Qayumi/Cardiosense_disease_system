@@ -1,0 +1,36 @@
+# ── Node / npm ────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-error.log
+
+# ── Environment files (NEVER commit these) ────────────────────────────────────
+.env
+.env.local
+.env.production
+.env.*.local
+
+# ── Build outputs ─────────────────────────────────────────────────────────────
+dist/
+build/
+
+# ── Python caches ─────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.pytest_cache/
+pytest-cache-files-*/
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+
+# ── OS & editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ── ML generated artifacts (can be regenerated) ───────────────────────────────
+ml/outputs/models/*.pkl
+ml/outputs/eda_plots/*.png
+ml/plots/*.png
