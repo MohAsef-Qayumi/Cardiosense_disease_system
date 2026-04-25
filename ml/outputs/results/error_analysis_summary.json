@@ -1,0 +1,13 @@
+{
+  "split": "Test",
+  "model": "XGBoost",
+  "total_samples": 13722,
+  "total_errors": 3648,
+  "error_rate": 0.2658504591167468,
+  "false_positives": 1338,
+  "false_negatives": 2310,
+  "true_positives": 4479,
+  "true_negatives": 5595,
+  "false_positive_rate": 0.19299004759844224,
+  "false_negative_rate": 0.34025629695095005
+}

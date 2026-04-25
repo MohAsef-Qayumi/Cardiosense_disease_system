@@ -1,0 +1,17 @@
+{
+  "base_url": "http://127.0.0.1:8000",
+  "endpoint": "/predict",
+  "total_requests": 500,
+  "concurrency": 20,
+  "timeout_seconds": 60.0,
+  "successful_requests": 491,
+  "failed_requests": 9,
+  "success_rate": 0.982,
+  "elapsed_seconds": 555.152,
+  "throughput_rps": 0.9,
+  "latency_ms_avg": 22040.34,
+  "latency_ms_p50": 23848.53,
+  "latency_ms_p95": 33847.14,
+  "latency_ms_p99": 35070.0,
+  "latency_ms_max": 37416.86
+}

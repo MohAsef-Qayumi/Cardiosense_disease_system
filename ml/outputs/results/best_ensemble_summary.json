@@ -1,0 +1,57 @@
+{
+  "selected_model": "soft_voting",
+  "best_metrics": {
+    "label": "step_ensemble_soft_voting",
+    "threshold": 0.41854511301222264,
+    "accuracy": 0.7339309138609532,
+    "precision": 0.7203032855939343,
+    "recall": 0.755634114007954,
+    "fnr": 0.24436588599204592,
+    "roc_auc": 0.8041846759305558,
+    "pr_auc": 0.7874354280289753,
+    "confusion_matrix": [
+      [
+        4941,
+        1992
+      ],
+      [
+        1659,
+        5130
+      ]
+    ],
+    "classification_report": {
+      "0": {
+        "precision": 0.7486363636363637,
+        "recall": 0.712678494158373,
+        "f1-score": 0.7302150299268455,
+        "support": 6933.0
+      },
+      "1": {
+        "precision": 0.7203032855939343,
+        "recall": 0.755634114007954,
+        "f1-score": 0.737545827043347,
+        "support": 6789.0
+      },
+      "accuracy": 0.7339309138609532,
+      "macro avg": {
+        "precision": 0.734469824615149,
+        "recall": 0.7341563040831636,
+        "f1-score": 0.7338804284850963,
+        "support": 13722.0
+      },
+      "weighted avg": {
+        "precision": 0.7346184896507891,
+        "recall": 0.7339309138609532,
+        "f1-score": 0.7338419634368243,
+        "support": 13722.0
+      }
+    }
+  },
+  "target_check": {
+    "precision_floor_met": true,
+    "target_recall_met": false,
+    "target_fnr_met": false,
+    "target_accuracy_met": false
+  },
+  "model_path": "C:\\Users\\DAR\\Desktop\\PF_AI_Project\\ml\\heart-disease-inference\\outputs\\models\\best_ensemble_model.pkl"
+}
