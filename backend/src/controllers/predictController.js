@@ -8,49 +8,86 @@ function getConfidenceTier(prob) {
   return "LOW";
 }
 
+/**
+ * Logistic-regression-style fallback when the ML API is unavailable.
+ * Mirrors the formula used in the React frontend so results are consistent.
+ */
+function fallbackEstimate(input) {
+  const ageYears = input.age_days / 365;
+  const bmi = input.weight / (input.height / 100) ** 2;
+  const bpRisk =
+    input.ap_hi > 140 || input.ap_lo > 90 ? 1.5
+    : input.ap_hi > 120 ? 0.8
+    : 0;
+  const score =
+    0.025 * (ageYears - 40) +
+    0.04 * (bmi - 22) +
+    0.18 * bpRisk +
+    0.12 * (input.cholesterol - 1) +
+    0.08 * (input.gluc - 1) +
+    0.05 * input.smoke +
+    0.03 * input.alco -
+    0.04 * input.active;
+  const pct = Math.min(95, Math.max(5, 30 + score * 18));
+  return pct / 100; // return as 0-1 probability
+}
+
 // ── POST /predict ─────────────────────────────────────────────────────────────
 async function predict(req, res, next) {
-  if (!ML_API_URL) {
-    return res.status(503).json({ detail: "ML API is not configured." });
-  }
-
   const { id, age, gender, height, weight, ap_hi, ap_lo, cholesterol, gluc, smoke, alco, active } = req.body;
-
   const input = { age_days: age, gender, height, weight, ap_hi, ap_lo, cholesterol, gluc, smoke, alco, active };
 
-  try {
-    const mlRes = await fetch(`${ML_API_URL.replace(/\/$/, "")}/predict`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, age, gender, height, weight, ap_hi, ap_lo, cholesterol, gluc, smoke, alco, active }),
-      signal: AbortSignal.timeout(10000),
-    });
+  // ── Try ML API first ───────────────────────────────────────────────────────
+  if (ML_API_URL) {
+    try {
+      const mlRes = await fetch(`${ML_API_URL.replace(/\/$/, "")}/predict`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, age, gender, height, weight, ap_hi, ap_lo, cholesterol, gluc, smoke, alco, active }),
+        signal: AbortSignal.timeout(10000),
+      });
 
-    if (!mlRes.ok) {
-      const err = await mlRes.text();
-      console.error(`ML API responded ${mlRes.status}:`, err);
-      return res.status(502).json({ detail: `ML API error ${mlRes.status}: ${err}` });
+      if (mlRes.ok) {
+        const mlData = await mlRes.json();
+        const prob_disease = mlData.result?.prob_disease;
+        const model_version = mlData.model_version || "ml-v1";
+        const confidence_tier = getConfidenceTier(prob_disease);
+
+        Prediction.create({
+          user: req.user?._id || null,
+          input,
+          result: { prob_disease, confidence_tier, model_version },
+          source: "ml-api",
+        }).catch(() => {});
+
+        return res.json({
+          result: { prob_disease, confidence_tier, model_version },
+          model_version,
+        });
+      }
+
+      console.error(`ML API responded ${mlRes.status}`);
+    } catch (err) {
+      console.error("ML API unreachable, using fallback:", err.message);
     }
-
-    const mlData = await mlRes.json();
-    const prob_disease = mlData.result?.prob_disease;
-    const model_version = mlData.model_version || "ml-v1";
-    const confidence_tier = getConfidenceTier(prob_disease);
-
-    Prediction.create({
-      user: req.user?._id || null,
-      input,
-      result: { prob_disease, confidence_tier, model_version },
-      source: "ml-api",
-    }).catch(() => {});
-
-    return res.json({
-      result: { prob_disease, confidence_tier, model_version },
-      model_version,
-    });
-  } catch (err) {
-    return res.status(503).json({ detail: "ML API is unreachable. Please try again later." });
   }
+
+  // ── Fallback: estimate locally and still persist to DB ────────────────────
+  const prob_disease = fallbackEstimate(input);
+  const confidence_tier = getConfidenceTier(prob_disease);
+  const model_version = "fallback-v1";
+
+  Prediction.create({
+    user: req.user?._id || null,
+    input,
+    result: { prob_disease, confidence_tier, model_version },
+    source: "fallback",
+  }).catch(() => {});
+
+  return res.json({
+    result: { prob_disease, confidence_tier, model_version },
+    model_version,
+  });
 }
 
 // ── POST /predictions ─────────────────────────────────────────────────────────

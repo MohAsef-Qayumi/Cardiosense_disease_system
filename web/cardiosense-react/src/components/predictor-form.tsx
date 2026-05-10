@@ -148,10 +148,15 @@ export function PredictorForm() {
         "Confidence: " + (data?.result?.confidence_tier || "medium"),
       );
       setMeta("Model version: " + (data?.result?.model_version || "v1"));
-      setSource("Prediction via API");
+      setSource(
+        data?.result?.model_version === "fallback-v1"
+          ? "Estimate (fallback mode — ML model offline)"
+          : "Prediction via ML API",
+      );
     } catch {
       setLoading(false);
-      // Fallback: logistic regression estimate when backend is unavailable
+      // Only reached when the backend itself is unreachable (network error).
+      // Compute a client-side estimate so the user still sees a result.
       const ageYears = Number(payload.age) / 365;
       const bmi = payload.weight / (payload.height / 100) ** 2;
       const bpRisk =
