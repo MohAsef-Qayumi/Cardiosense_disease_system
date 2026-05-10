@@ -34,4 +34,6 @@ Thumbs.db
 ml/outputs/models/*.pkl
 ml/outputs/eda_plots/*.png
 ml/plots/*.png
-C:\Users\LENOVO\Desktop\4th semester\programming for ai\PF_AI_Project\make-commits.ps1
+
+# ── Scripts that should not be committed ──────────────────────────────────────
+make-commits.ps1
