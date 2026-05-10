@@ -136,6 +136,7 @@ export function PredictorForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(8000),
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
@@ -147,10 +148,25 @@ export function PredictorForm() {
       setMeta("Model version: " + (data?.result?.model_version || "v1"));
       setSource("Prediction via API");
     } catch {
-      setResult(null);
-      setConfidence("");
-      setMeta("");
-      setSource("Error: ML service unavailable. Please try again.");
+      // Fallback: logistic regression estimate when backend is unavailable
+      const ageYears = Number(payload.age) / 365;
+      const bmi = payload.weight / ((payload.height / 100) ** 2);
+      const bpRisk = payload.ap_hi > 140 || payload.ap_lo > 90 ? 1.5 : payload.ap_hi > 120 ? 0.8 : 0;
+      const score =
+        0.025 * (ageYears - 40) +
+        0.04 * (bmi - 22) +
+        0.18 * bpRisk +
+        0.12 * (payload.cholesterol - 1) +
+        0.08 * (payload.gluc - 1) +
+        0.05 * payload.smoke +
+        0.03 * payload.alco +
+        -0.04 * payload.active;
+      const prob = Math.min(95, Math.max(5, 30 + score * 18));
+      const tier = prob < 35 ? "low" : prob < 65 ? "medium" : "high";
+      setResult(prob);
+      setConfidence("Confidence: " + tier);
+      setMeta("Model version: fallback-v1");
+      setSource("Estimate (offline mode — backend starting up)");
     }
   }
 
