@@ -4,12 +4,13 @@ import { loadModelMetrics, formatPercent, formatNumber, EnsembleMetrics } from "
 export default function DashboardModels() {
   const [metrics, setMetrics] = useState<EnsembleMetrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    loadModelMetrics().then(m => {
-      setMetrics(m);
-      setLoading(false);
-    });
+    loadModelMetrics()
+      .then(m => { setMetrics(m); })
+      .catch(() => { setError(true); })
+      .finally(() => { setLoading(false); });
   }, []);
 
   if (loading) {
@@ -23,8 +24,20 @@ export default function DashboardModels() {
     );
   }
 
-  const bestModel = metrics!.models.reduce((best, m) => 
-    m.metrics.accuracy > best.metrics.accuracy ? m : best
+  if (error || !metrics) {
+    return (
+      <div className="d-flex align-items-center justify-content-center" style={{ height: "60vh" }}>
+        <div className="text-center">
+          <i className="bi bi-exclamation-triangle text-warning" style={{ fontSize: "2rem" }}></i>
+          <p className="text-muted mt-2">Could not load model metrics. Please refresh.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const bestModel = metrics.models.reduce((best, m) => 
+    m.metrics.accuracy > best.metrics.accuracy ? m : best,
+    metrics.models[0]
   );
 
   const modelConfig: Record<string, { color: string; bg: string; icon: string; desc: string }> = {
@@ -46,9 +59,9 @@ export default function DashboardModels() {
       <div className="dashboard-stats-grid">
         {[
           { icon: "bi-trophy", label: "Best Model", value: bestModel.name, color: "#ffd700" },
-          { icon: "bi-tag", label: "Total Models", value: String(metrics!.models.length), color: "var(--teal)" },
-          { icon: "bi-sliders", label: "Optimal Threshold", value: formatNumber(metrics!.threshold, 4), color: "var(--amber)" },
-          { icon: "bi-check-circle", label: "Calibration", value: metrics!.config.calibrationMethod, color: "var(--primary)" },
+          { icon: "bi-tag", label: "Total Models", value: String(metrics.models.length), color: "var(--teal)" },
+          { icon: "bi-sliders", label: "Optimal Threshold", value: formatNumber(metrics.threshold ?? 0, 4), color: "var(--amber)" },
+          { icon: "bi-check-circle", label: "Calibration", value: metrics.config?.calibrationMethod ?? "sigmoid", color: "var(--primary)" },
         ].map((stat, idx) => (
           <div key={idx} className="dashboard-stat-card" data-reveal style={{ borderLeft: `4px solid ${stat.color}` }}>
             <div className="d-flex justify-content-between align-items-start">
@@ -66,7 +79,7 @@ export default function DashboardModels() {
 
       {/* Model Cards */}
       <div className="row g-3 mb-4">
-        {metrics!.models.map((model, idx) => {
+        {metrics.models.map((model, idx) => {
           const config = modelConfig[model.name] || { color: "#666", bg: "#f5f5f5", icon: "bi-cpu", desc: "" };
           const isBest = model.name === bestModel.name;
           return (
@@ -151,7 +164,7 @@ export default function DashboardModels() {
               </tr>
             </thead>
             <tbody>
-              {[...metrics!.models]
+              {[...metrics.models]
                 .sort((a, b) => b.metrics.accuracy - a.metrics.accuracy)
                 .map((model, idx) => {
                   const isBest = model.name === bestModel.name;
@@ -252,8 +265,8 @@ export default function DashboardModels() {
         <div className="row g-3">
           {[
             { icon: "bi-collection", title: "Ensemble Methods", desc: "Soft Voting (probability averaging) & Stacking (meta-learner on calibrated probabilities)", color: "#7c4dff" },
-            { icon: "bi-check-circle", title: "Calibration", desc: `Sigmoid calibration applied to all base models. Random state: ${metrics!.config.randomState}`, color: "var(--teal)" },
-            { icon: "bi-bullseye", title: "Objective", desc: `Balanced accuracy optimization targeting ${metrics!.config.targetRecall * 100}% recall and ${metrics!.config.targetAccuracy * 100}% accuracy`, color: "var(--primary)" },
+            { icon: "bi-check-circle", title: "Calibration", desc: `Sigmoid calibration applied to all base models. Random state: ${metrics.config?.randomState ?? 42}`, color: "var(--teal)" },
+            { icon: "bi-bullseye", title: "Objective", desc: `Balanced accuracy optimization targeting ${((metrics.config?.targetRecall ?? 0.83) * 100).toFixed(0)}% recall and ${((metrics.config?.targetAccuracy ?? 0.78) * 100).toFixed(0)}% accuracy`, color: "var(--primary)" },
             { icon: "bi-database", title: "Dataset", desc: "68,000+ BRFSS 2015 samples. 13,722 test samples (20% holdout). 11 clinical & lifestyle features.", color: "var(--amber)" },
             { icon: "bi-shield-shaded", title: "Validation", desc: "5-fold cross-validation with stratification. Precision floor: 72% enforced.", color: "#00bcd4" },
             { icon: "bi-graph-up-arrow", title: "Optimization", desc: "Threshold search over 41 values from 0.30 to 0.70 with 0.01 step size.", color: "#4caf50" },
