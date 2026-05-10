@@ -94,7 +94,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     { href: "/dashboard/predict", label: "Predictor", icon: "bi-activity" },
     { href: "/dashboard/history", label: "History", icon: "bi-clock-history" },
     { href: "/dashboard/analytics", label: "Analytics", icon: "bi-graph-up" },
-    { href: "/dashboard/models", label: "Model Info", icon: "bi-cpu" },
   ];
 
   if (!user) {
