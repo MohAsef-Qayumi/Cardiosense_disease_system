@@ -106,10 +106,7 @@ export default function DashboardAnalytics() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
-
-  // Re-trigger reveal animations after async content mounts.
-  // useRevealAnimation runs on route change when the DOM is still empty
-  // (loading=true), so newly rendered elements never get observed.
+  
   useEffect(() => {
     if (loading) return;
     const id = setTimeout(() => {

@@ -32,5 +32,6 @@ Thumbs.db
 .idea/
 
 # ── ML generated artifacts (can be regenerated) ───────────────────────────────
+ml/outputs/models/*.pkl
 ml/outputs/eda_plots/*.png
 ml/plots/*.png

@@ -133,7 +133,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <i className="bi bi-list"></i>
         </button>
         <span style={{ fontWeight: 700, fontSize: "1.1rem" }}>
-          <i className="bi bi-heart-pulse-fill" style={{ color: "var(--primary)", marginRight: 6 }} />
+          <i
+            className="bi bi-heart-pulse-fill"
+            style={{ color: "var(--primary)", marginRight: 6 }}
+          />
           CardioSense
         </span>
         <span />
@@ -141,7 +144,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       {/* Backdrop */}
       {sidebarOpen && (
-        <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+        <div
+          className="sidebar-backdrop"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
       <aside className={`dashboard-sidebar${sidebarOpen ? " open" : ""}`}>

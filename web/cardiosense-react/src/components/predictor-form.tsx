@@ -98,6 +98,7 @@ export function PredictorForm() {
   const [confidence, setConfidence] = useState("");
   const [meta, setMeta] = useState("");
   const [source, setSource] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const riskLabel = useMemo(() => {
     if (result === null) return "Awaiting input";
@@ -115,6 +116,7 @@ export function PredictorForm() {
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setLoading(true);
     const form = new FormData(e.currentTarget);
     const payload = {
       id: Number(form.get("sample_id")),
@@ -148,10 +150,16 @@ export function PredictorForm() {
       setMeta("Model version: " + (data?.result?.model_version || "v1"));
       setSource("Prediction via API");
     } catch {
+      setLoading(false);
       // Fallback: logistic regression estimate when backend is unavailable
       const ageYears = Number(payload.age) / 365;
-      const bmi = payload.weight / ((payload.height / 100) ** 2);
-      const bpRisk = payload.ap_hi > 140 || payload.ap_lo > 90 ? 1.5 : payload.ap_hi > 120 ? 0.8 : 0;
+      const bmi = payload.weight / (payload.height / 100) ** 2;
+      const bpRisk =
+        payload.ap_hi > 140 || payload.ap_lo > 90
+          ? 1.5
+          : payload.ap_hi > 120
+            ? 0.8
+            : 0;
       const score =
         0.025 * (ageYears - 40) +
         0.04 * (bmi - 22) +
@@ -167,6 +175,8 @@ export function PredictorForm() {
       setConfidence("Confidence: " + tier);
       setMeta("Model version: fallback-v1");
       setSource("Estimate (offline mode — backend starting up)");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -208,8 +218,20 @@ export function PredictorForm() {
                 Input map: age is converted from years to days before request
                 submission.
               </span>
-              <button className="btn-primary-cs" type="submit">
-                <i className="bi bi-play-circle" /> Predict Risk
+              <button className="btn-primary-cs" type="submit" disabled={loading}>
+                {loading ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                      style={{ marginRight: "8px" }}
+                    />
+                    Analyzing...
+                  </>
+                ) : (
+                  <><i className="bi bi-play-circle" /> Predict Risk</>
+                )}
               </button>
             </div>
           </form>

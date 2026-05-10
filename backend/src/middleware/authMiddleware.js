@@ -30,11 +30,6 @@ async function requireAuth(req, res, next) {
   }
 }
 
-/**
- * optionalAuth – attaches req.user if a valid token is present,
- * but never blocks the request. Use for routes that work for
- * both guests and authenticated users (e.g. /predict).
- */
 async function optionalAuth(req, res, next) {
   const token = extractToken(req);
   if (token) {

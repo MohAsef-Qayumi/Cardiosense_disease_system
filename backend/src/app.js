@@ -13,25 +13,8 @@ const errorHandler = require("./middleware/errorHandler");
 const app = express();
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  "https://cardiosense-disease-system.vercel.app",
-  "http://localhost:5173",
-  "http://localhost:3000",
-].filter(Boolean);
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(null, false);
-      }
-    },
-    credentials: true,
-  }),
-);
+app.use(cors());
 
 // ── BODY + LOGGING ────────────────────────────────────────────────────────────
 app.use(express.json({ limit: "10kb" }));

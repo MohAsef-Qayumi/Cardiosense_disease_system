@@ -1,7 +1,4 @@
-/**
- * Central error handler – must be registered last in app.js.
- * Converts any thrown error into a consistent JSON response.
- */
+
 function errorHandler(err, req, res, _next) {
   // Mongoose duplicate key (e.g. duplicate email on signup)
   if (err.code === 11000) {
