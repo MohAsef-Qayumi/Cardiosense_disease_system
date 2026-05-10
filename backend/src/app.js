@@ -15,6 +15,7 @@ const app = express();
 // ── CORS ──────────────────────────────────────────────────────────────────────
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  "https://cardiosense-disease-system.vercel.app",
   "http://localhost:5173",
   "http://localhost:3000",
 ].filter(Boolean);
@@ -22,11 +23,10 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, curl, Postman)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error("CORS: origin not allowed"));
+        callback(null, false);
       }
     },
     credentials: true,
