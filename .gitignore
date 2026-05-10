@@ -6,6 +6,7 @@ yarn-error.log
 # ── Environment files (NEVER commit these) ────────────────────────────────────
 .env
 .env.local
+.env.example
 .env.production
 .env.*.local
 
@@ -34,6 +35,3 @@ Thumbs.db
 ml/outputs/models/*.pkl
 ml/outputs/eda_plots/*.png
 ml/plots/*.png
-
-# ── Scripts that should not be committed ──────────────────────────────────────
-make-commits.ps1

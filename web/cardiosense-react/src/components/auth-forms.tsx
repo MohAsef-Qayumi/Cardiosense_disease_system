@@ -10,6 +10,7 @@ export function LoginForm() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "ok" | "bad">("idle");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -73,14 +74,24 @@ export function LoginForm() {
       </div>
       <div className="field">
         <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          name="password"
-          placeholder="Enter your password"
-          type="password"
-          required
-          minLength={8}
-        />
+        <div className="password-wrapper">
+          <input
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            type={showPassword ? "text" : "password"}
+            required
+            minLength={8}
+          />
+          <button
+            type="button"
+            className="password-toggle"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            <i className={showPassword ? "bi bi-eye-slash" : "bi bi-eye"} />
+          </button>
+        </div>
       </div>
       <div className="auth-inline">
         <label className="auth-check" htmlFor="rememberMe">
@@ -97,10 +108,6 @@ export function LoginForm() {
         )}
         {loading ? " Logging in..." : " Log In"}
       </button>
-      <div className="auth-divider">or</div>
-      <Link to="/" className="auth-secondary">
-        <i className="bi bi-activity" /> Try predictor demo without login
-      </Link>
       {message && (
         <p className={`auth-status is-visible ${status}`}>{message}</p>
       )}

@@ -1166,6 +1166,30 @@ img {
   color: var(--ink-muted);
 }
 
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.password-wrapper input {
+  flex: 1;
+  padding-right: 2.5rem;
+}
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--ink-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  line-height: 1;
+}
+.password-toggle:hover {
+  color: var(--accent);
+}
+
 .auth-inline {
   display: flex;
   flex-wrap: wrap;
