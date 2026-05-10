@@ -147,17 +147,10 @@ export function PredictorForm() {
       setMeta("Model version: " + (data?.result?.model_version || "v1"));
       setSource("Prediction via API");
     } catch {
-      const fallback = Math.min(
-        98,
-        Math.max(
-          2,
-          (payload.ap_hi - 100) * 0.5 + (payload.cholesterol - 1) * 18 + 24,
-        ),
-      );
-      setResult(fallback);
-      setConfidence("Confidence: medium (fallback)");
-      setMeta("Model version: fallback estimator");
-      setSource("Fallback estimate used");
+      setResult(null);
+      setConfidence("");
+      setMeta("");
+      setSource("Error: ML service unavailable. Please try again.");
     }
   }
 

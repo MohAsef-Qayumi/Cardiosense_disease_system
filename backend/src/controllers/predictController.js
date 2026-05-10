@@ -28,7 +28,8 @@ async function predict(req, res, next) {
 
     if (!mlRes.ok) {
       const err = await mlRes.text();
-      return res.status(502).json({ detail: `ML API error: ${err}` });
+      console.error(`ML API responded ${mlRes.status}:`, err);
+      return res.status(502).json({ detail: `ML API error ${mlRes.status}: ${err}` });
     }
 
     const mlData = await mlRes.json();
