@@ -30,7 +30,9 @@ export function SiteHeader() {
     <nav className="navbar navbar-expand-lg cs-navbar">
       <div className="container">
         <Link to="/" className="navbar-brand brand">
-          <span className="brand-mark"><i className="bi bi-heart-pulse-fill" /></span>
+          <span className="brand-mark">
+            <i className="bi bi-heart-pulse-fill" />
+          </span>
           CardioSense <span className="brand-accent">AI</span>
         </Link>
         <button
@@ -43,13 +45,19 @@ export function SiteHeader() {
         >
           <span className="navbar-toggler-icon" />
         </button>
-        <div className={`collapse navbar-collapse ${mobileOpen ? "show" : ""}`} id="mainNav">
+        <div
+          className={`collapse navbar-collapse ${mobileOpen ? "show" : ""}`}
+          id="mainNav"
+        >
           <ul className="navbar-nav ms-auto align-items-lg-center gap-lg-1">
             {navItems.map((item) => {
               const active = location.pathname === item.href;
               return (
                 <li className="nav-item" key={item.href}>
-                  <Link to={item.href} className={`nav-link ${active ? "active" : ""}`}>
+                  <Link
+                    to={item.href}
+                    className={`nav-link ${active ? "active" : ""}`}
+                  >
                     <i className={item.icon}></i> {item.label}
                   </Link>
                 </li>
@@ -59,11 +67,22 @@ export function SiteHeader() {
           <div className="d-flex flex-wrap gap-2 ms-lg-3 mt-3 mt-lg-0">
             {user ? (
               <>
-                <span className="d-flex align-items-center gap-2" style={{ fontSize: "0.9rem", color: "var(--ink-soft)", fontWeight: 600 }}>
+                <span
+                  className="d-flex align-items-center gap-2"
+                  style={{
+                    fontSize: "0.9rem",
+                    color: "var(--ink-soft)",
+                    fontWeight: 600,
+                  }}
+                >
                   <i className="bi bi-person-circle" />
                   {user.fullName}
                 </span>
-                <button onClick={logout} className="btn-outline-cs" style={{ border: "none", background: "transparent" }}>
+                <button
+                  onClick={logout}
+                  className="btn-outline-cs"
+                  style={{ border: "none", background: "transparent" }}
+                >
                   <i className="bi bi-box-arrow-right" /> Log Out
                 </button>
               </>
@@ -88,6 +107,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const menuItems = [
     { href: "/dashboard", label: "Overview", icon: "bi-grid-1x2-fill" },
@@ -103,14 +123,44 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="dashboard-layout">
-      <aside className="dashboard-sidebar">
+      {/* Mobile top bar */}
+      <div className="dashboard-mobile-topbar">
+        <button
+          className="sidebar-toggle-btn"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Open menu"
+        >
+          <i className="bi bi-list"></i>
+        </button>
+        <span style={{ fontWeight: 700, fontSize: "1.1rem" }}>
+          <i className="bi bi-heart-pulse-fill" style={{ color: "var(--primary)", marginRight: 6 }} />
+          CardioSense
+        </span>
+        <span />
+      </div>
+
+      {/* Backdrop */}
+      {sidebarOpen && (
+        <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      <aside className={`dashboard-sidebar${sidebarOpen ? " open" : ""}`}>
         <div className="sidebar-header">
-          <Link to="/" className="brand">
-            <span className="brand-mark"><i className="bi bi-heart-pulse-fill" /></span>
+          <Link to="/" className="brand" onClick={() => setSidebarOpen(false)}>
+            <span className="brand-mark">
+              <i className="bi bi-heart-pulse-fill" />
+            </span>
             CardioSense
           </Link>
+          <button
+            className="sidebar-close-btn"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close menu"
+          >
+            <i className="bi bi-x-lg"></i>
+          </button>
         </div>
-        
+
         <div className="sidebar-user">
           <div className="user-avatar">
             <i className="bi bi-person-circle"></i>
@@ -129,6 +179,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 to={item.href}
                 className={`sidebar-link ${active ? "active" : ""}`}
+                onClick={() => setSidebarOpen(false)}
               >
                 <i className={item.icon}></i>
                 <span>{item.label}</span>
@@ -145,9 +196,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      <main className="dashboard-main">
-        {children}
-      </main>
+      <main className="dashboard-main">{children}</main>
     </div>
   );
 }
